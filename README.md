@@ -28,7 +28,7 @@ The authenticated audit log is available at `/admin/xdr/audit-log`. Run `php art
 Audit records contain administrator IDs, source IP addresses, request paths, and selected before/after values. Credentials, tokens, and uploaded image contents/references are excluded from value snapshots. Restrict access to the database and audit page, inform users as required by your privacy policy, and set a retention/deletion schedule appropriate to your legal and operational requirements.
 
 ### Admin password update
-
+userid: esaju.cse@gmail.com  password: Profile2026#
 Authenticated administrators can change their password from the **Update Password** card on `/admin`. The form requires the current password and a matching new password of at least 12 characters with uppercase, lowercase, numeric, and symbol characters. On success, the new password is hashed, the remember token is rotated, and the active session ID is regenerated. No email reset flow or extra database migration is used.
 
 ### Approximate IP geolocation
