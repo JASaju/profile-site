@@ -7,6 +7,32 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## XDR / Wazuh console
+
+The authenticated admin area includes an XDR overview at `/admin/xdr` and a request activity table at `/admin/xdr/requests`. After deploying, run `php artisan migrate` (or `php artisan migrate --force` in production) to create the request activity table. Until the migration has run, request logging is skipped and the XDR pages display a setup notice; normal site requests continue. The web middleware records the client IP, method, path, response status, and timestamp; query strings, request bodies, and user agents are not stored.
+
+### Existing databases without migration history
+
+If importing this project into a database that already has some of its tables but no matching `migrations` records, do not run `migrate:fresh`, `migrate:refresh`, or `db:wipe`. First back up the database, then run `php artisan migrate:baseline` to preview which project migrations have all their expected tables already present. Check that the existing table schemas match the corresponding migration definitions. If a migration is only partially present, the command stops without changing migration history; reconcile that schema manually before continuing.
+
+After confirming the preview, run `php artisan migrate:baseline --apply`. This only creates/updates Laravel's migration-history table and records migrations whose complete table sets already exist; it does not create, drop, or modify application tables. Then run `php artisan migrate` (or `php artisan migrate --force` in production) to create tables for migrations that had none of their expected tables, including `request_activities` when it is absent. On a new, empty database, skip the baseline step and run `php artisan migrate` directly.
+
+The `/admin/xdr/benefits` page presents manually curated XDR and SIEM reference benefits, including telemetry visibility, correlation, response, investigation, compliance, search, automation, governance, resilience, and cost control, plus a comparison and shared business value. The page reads these records through the `SecurityBenefitModule`, `SecurityBenefitCategory`, and `SecurityBenefit` models; the `SecurityBenefitsSeeder` inserts the initial catalog without replacing or deleting existing records. After applying the additive schema migration, run `php artisan db:seed --class="Database\\Seeders\\SecurityBenefitsSeeder"` (or use `php artisan db:seed` for the standard database seeder). Access remains behind admin authentication and the benefit policy. These are potential outcomes only, not claims of enabled platform features or measured results. This project does not connect to a live Wazuh, XDR, or SIEM service through the benefits page.
+
+The Wazuh alert feed and agent inventory are explicitly demo telemetry, not a live Wazuh connection. Configure trusted proxies before deployment so client IPs are only accepted from known proxies, and apply an appropriate retention period and privacy notice for stored IP addresses.
+
+### Admin audit log
+
+The authenticated audit log is available at `/admin/xdr/audit-log`. Run `php artisan migrate` to create the additive `audit_logs` table (or use the documented baseline workflow first when reconciling an existing database). The log records successful/failed sign-ins, sign-outs, and admin profile/content creates, updates, and deletes. If the table is not present, audit writes are skipped and the page displays migration instructions without interrupting normal site actions.
+
+Audit records contain administrator IDs, source IP addresses, request paths, and selected before/after values. Credentials, tokens, and uploaded image contents/references are excluded from value snapshots. Restrict access to the database and audit page, inform users as required by your privacy policy, and set a retention/deletion schedule appropriate to your legal and operational requirements.
+
+### Approximate IP geolocation
+
+Request activity and audit records can include an approximate country, region/city, and coordinates. Geolocation is opt-in: set `IP_GEOLOCATION_ENABLED=true` in `.env` and run `php artisan config:cache` if configuration is cached. The default provider is IPwho.is at `https://ipwho.is/{ip}` and requires no API key; set `IP_GEOLOCATION_URL` to a compatible provider endpoint if needed. Adjust `IP_GEOLOCATION_TIMEOUT`, `IP_GEOLOCATION_CACHE_DAYS`, and `IP_GEOLOCATION_REQUESTS_PER_MINUTE` to fit the environment. Apply `php artisan migrate` to add nullable location fields to existing activity and audit tables; the migration preserves existing records.
+
+Lookups run only on the server. Private, loopback, and reserved IPs are skipped; successful results are cached (30 days by default), failed results briefly (60 seconds), and provider calls are rate-limited (30 per minute by default). Public visitor locations appear only when the site is accessed publicly, geolocation is enabled, and trusted proxies are configured correctly. Approximate coordinates are displayed with a Google Maps link; opening that link shares the coordinates—not the original IP—with Google. IP geolocation can reveal personal data: disclose the provider transfer, limit retention/access, and enable the integration only after reviewing the provider and your privacy requirements.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

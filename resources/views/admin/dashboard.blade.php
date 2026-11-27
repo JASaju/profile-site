@@ -19,6 +19,8 @@
     <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <span class="font-semibold">Admin Dashboard</span>
         <div class="flex items-center gap-4 text-sm">
+            <a href="{{ route('admin.xdr') }}" class="text-slate-700 hover:text-slate-950">XDR / Wazuh</a>
+            <a href="{{ route('admin.xdr.audit-log') }}" class="text-slate-700 hover:text-slate-950">Audit log</a>
             <a href="{{ route('home') }}" target="_blank" class="text-blue-600 hover:underline">View site</a>
             <form method="POST" action="{{ route('logout') }}">@csrf
                 <button class="text-slate-600 hover:text-slate-900">Logout</button>

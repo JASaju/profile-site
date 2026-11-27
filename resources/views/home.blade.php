@@ -66,6 +66,7 @@
         <a href="#top" class="font-semibold truncate">{{ $profile->name ?? 'My Profile' }}</a>
         <nav class="hidden sm:flex gap-5 text-sm text-slate-600">
             @foreach($navLinks as $href => $label)<a href="{{ $href }}" class="hover:text-slate-900">{{ $label }}</a>@endforeach
+            @auth<a href="{{ route('admin.xdr') }}" class="hover:text-slate-900">XDR</a>@endauth
             <a href="{{ auth()->check() ? route('admin.dashboard') : route('login') }}" class="text-slate-400 hover:text-slate-900">{{ auth()->check() ? 'Admin' : 'Login' }}</a>
         </nav>
         <button id="menuBtn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu"
@@ -75,6 +76,7 @@
     </div>
     <nav id="mobileMenu" class="hidden sm:hidden border-t bg-white px-4 py-2 text-sm">
         @foreach($navLinks as $href => $label)<a href="{{ $href }}" class="block py-2.5 text-slate-700">{{ $label }}</a>@endforeach
+        @auth<a href="{{ route('admin.xdr') }}" class="block py-2.5 text-slate-700">XDR / Wazuh</a>@endauth
         <a href="{{ auth()->check() ? route('admin.dashboard') : route('login') }}" class="block py-2.5 text-slate-400">{{ auth()->check() ? 'Admin' : 'Login' }}</a>
     </nav>
 </header>

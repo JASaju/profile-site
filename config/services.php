@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ip_geolocation' => [
+        'enabled' => env('IP_GEOLOCATION_ENABLED', false),
+        'url' => env('IP_GEOLOCATION_URL', 'https://ipwho.is/{ip}'),
+        'timeout' => env('IP_GEOLOCATION_TIMEOUT', 3),
+        'cache_days' => env('IP_GEOLOCATION_CACHE_DAYS', 30),
+        'requests_per_minute' => env('IP_GEOLOCATION_REQUESTS_PER_MINUTE', 30),
+    ],
+
 ];

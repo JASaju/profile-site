@@ -9,29 +9,32 @@ use App\Models\Media;
 use App\Models\Profile;
 use App\Models\Slide;
 use App\Models\SocialLink;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
+    public function __construct(private AuditLogger $auditLogger) {}
+
     /** type => [model class, validation rules] */
     private function types(): array
     {
         return [
             'social' => [SocialLink::class, [
                 'platform' => ['required', 'string', 'max:50'],
-                'url'      => ['required', 'url', 'max:255'],
+                'url' => ['required', 'url', 'max:255'],
             ]],
             'education' => [Education::class, [
                 'institution' => ['required', 'string', 'max:255'],
-                'degree'      => ['nullable', 'string', 'max:255'],
-                'field'       => ['nullable', 'string', 'max:255'],
-                'start_year'  => ['nullable', 'string', 'max:10'],
-                'end_year'    => ['nullable', 'string', 'max:10'],
+                'degree' => ['nullable', 'string', 'max:255'],
+                'field' => ['nullable', 'string', 'max:255'],
+                'start_year' => ['nullable', 'string', 'max:10'],
+                'end_year' => ['nullable', 'string', 'max:10'],
                 'description' => ['nullable', 'string', 'max:2000'],
             ]],
             'documentary' => [Documentary::class, [
-                'title'       => ['required', 'string', 'max:255'],
+                'title' => ['required', 'string', 'max:255'],
                 'youtube_url' => ['required', 'url', 'max:255'],
                 'description' => ['nullable', 'string', 'max:2000'],
             ]],
@@ -40,9 +43,9 @@ class AdminController extends Controller
                 'image' => ['required', 'image', 'max:4096'],
             ]],
             'slide' => [Slide::class, [
-                'title'   => ['nullable', 'string', 'max:255'],
+                'title' => ['nullable', 'string', 'max:255'],
                 'caption' => ['nullable', 'string', 'max:255'],
-                'image'   => ['required', 'image', 'max:4096'],
+                'image' => ['required', 'image', 'max:4096'],
             ]],
         ];
     }
@@ -50,29 +53,30 @@ class AdminController extends Controller
     public function dashboard()
     {
         return view('admin.dashboard', [
-            'profile'       => Profile::first() ?? new Profile(),
-            'slides'        => Slide::orderBy('sort_order')->get(),
-            'socials'       => SocialLink::orderBy('sort_order')->get(),
-            'education'     => Education::orderBy('sort_order')->get(),
+            'profile' => Profile::first() ?? new Profile,
+            'slides' => Slide::orderBy('sort_order')->get(),
+            'socials' => SocialLink::orderBy('sort_order')->get(),
+            'education' => Education::orderBy('sort_order')->get(),
             'documentaries' => Documentary::orderBy('sort_order')->get(),
-            'gallery'       => GalleryItem::orderBy('sort_order')->get(),
+            'gallery' => GalleryItem::orderBy('sort_order')->get(),
         ]);
     }
 
     public function updateProfile(Request $request)
     {
         $data = $request->validate([
-            'name'                => ['required', 'string', 'max:255'],
-            'headline'            => ['nullable', 'string', 'max:255'],
-            'bio'                 => ['nullable', 'string', 'max:5000'],
-            'email'               => ['nullable', 'email', 'max:255'],
-            'phone'               => ['nullable', 'string', 'max:50'],
-            'location'            => ['nullable', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
+            'headline' => ['nullable', 'string', 'max:255'],
+            'bio' => ['nullable', 'string', 'max:5000'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'location' => ['nullable', 'string', 'max:255'],
             'youtube_channel_url' => ['nullable', 'url', 'max:255'],
-            'photo'               => ['nullable', 'image', 'max:4096'],
+            'photo' => ['nullable', 'image', 'max:4096'],
         ]);
 
-        $profile = Profile::first() ?? new Profile();
+        $profile = Profile::first() ?? new Profile;
+        $oldValues = $profile->exists ? $profile->only(array_keys($data)) : [];
 
         if ($request->hasFile('photo')) {
             if ($profile->photo) {
@@ -85,6 +89,14 @@ class AdminController extends Controller
         }
 
         $profile->fill($data)->save();
+        $this->auditLogger->record(
+            $request,
+            'admin.profile.updated',
+            'Profile details updated.',
+            'info',
+            $oldValues,
+            $profile->only(array_keys($data))
+        );
 
         return back()->with('status', 'Profile saved.');
     }
@@ -99,22 +111,38 @@ class AdminController extends Controller
         }
 
         $data['sort_order'] = ((int) $model::max('sort_order')) + 1;
-        $model::create($data);
+        $item = $model::create($data);
+        $this->auditLogger->record(
+            $request,
+            'admin.'.$type.'.created',
+            ucfirst($type).' item created (ID '.$item->getKey().').',
+            'info',
+            null,
+            $item->getAttributes()
+        );
 
-        return back()->with('status', ucfirst($type) . ' added.');
+        return back()->with('status', ucfirst($type).' added.');
     }
 
-    public function destroy(string $type, int $id)
+    public function destroy(Request $request, string $type, int $id)
     {
         [$model] = $this->types()[$type];
         $item = $model::findOrFail($id);
+        $oldValues = $item->getAttributes();
 
-        if (!empty($item->image)) {
+        if (! empty($item->image)) {
             Media::forget($item->image);
             Storage::disk('public')->delete($item->image);
         }
         $item->delete();
+        $this->auditLogger->record(
+            $request,
+            'admin.'.$type.'.deleted',
+            ucfirst($type).' item deleted (ID '.$id.').',
+            'warning',
+            $oldValues
+        );
 
-        return back()->with('status', ucfirst($type) . ' deleted.');
+        return back()->with('status', ucfirst($type).' deleted.');
     }
 }

@@ -13,17 +13,19 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(SecurityBenefitsSeeder::class);
+
         User::updateOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@example.com')],
             ['name' => 'Admin', 'password' => Hash::make(env('ADMIN_PASSWORD', 'ChangeMe123!'))]
         );
 
-        if (!Profile::exists()) {
+        if (! Profile::exists()) {
             Profile::create([
-                'name'                => 'Your Name',
-                'headline'            => 'Documentary Maker & Content Creator',
-                'bio'                 => 'Write a short bio about yourself here.',
-                'email'               => 'you@example.com',
+                'name' => 'Your Name',
+                'headline' => 'Documentary Maker & Content Creator',
+                'bio' => 'Write a short bio about yourself here.',
+                'email' => 'you@example.com',
                 'youtube_channel_url' => 'https://www.youtube.com/@yourchannel',
             ]);
             SocialLink::create(['platform' => 'Facebook', 'url' => 'https://facebook.com/yourpage', 'sort_order' => 1]);

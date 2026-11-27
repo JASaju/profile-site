@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\XdrController;
 use Illuminate\Support\Facades\Route;
 
 // Public profile page
@@ -42,6 +43,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::put('/profile', [AdminController::class, 'updateProfile'])->name('profile');
+    Route::get('/xdr', [XdrController::class, 'dashboard'])->name('xdr');
+    Route::get('/xdr/requests', [XdrController::class, 'requests'])->name('xdr.requests');
+    Route::get('/xdr/benefits', [XdrController::class, 'benefits'])->name('xdr.benefits');
+    Route::get('/xdr/audit-log', [XdrController::class, 'auditLog'])->name('xdr.audit-log');
 
     $types = 'social|education|documentary|gallery|slide';
     Route::post('/{type}', [AdminController::class, 'store'])->where('type', $types)->name('store');
