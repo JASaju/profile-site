@@ -9,7 +9,7 @@
 
 ## XDR / Wazuh console
 
-The authenticated admin area includes an XDR overview at `/admin/xdr` and a request activity table at `/admin/xdr/requests`. After deploying, run `php artisan migrate` (or `php artisan migrate --force` in production) to create the request activity table. Until the migration has run, request logging is skipped and the XDR pages display a setup notice; normal site requests continue. The web middleware records the client IP, method, path, response status, and timestamp; query strings, request bodies, and user agents are not stored.
+The authenticated admin area includes an XDR overview at `/admin/xdr` and a request activity table at `/admin/xdr/requests`. After deploying, run `php artisan migrate` (or `php artisan migrate --force` in production) to create the request activity table. Until the migration has run, request logging is skipped and the XDR pages display a setup notice; normal site requests continue. The web middleware records the client IP, method, path, response status, and timestamp for site requests, including unauthenticated `GET /login` visits; query strings, request bodies, and user agents are not stored.
 
 ### Existing databases without migration history
 
@@ -19,7 +19,7 @@ After confirming the preview, run `php artisan migrate:baseline --apply`. This o
 
 The `/admin/xdr/benefits` page presents manually curated XDR and SIEM reference benefits, including telemetry visibility, correlation, response, investigation, compliance, search, automation, governance, resilience, and cost control, plus a comparison and shared business value. The page reads these records through the `SecurityBenefitModule`, `SecurityBenefitCategory`, and `SecurityBenefit` models; the `SecurityBenefitsSeeder` inserts the initial catalog without replacing or deleting existing records. After applying the additive schema migration, run `php artisan db:seed --class="Database\\Seeders\\SecurityBenefitsSeeder"` (or use `php artisan db:seed` for the standard database seeder). Access remains behind admin authentication and the benefit policy. These are potential outcomes only, not claims of enabled platform features or measured results. This project does not connect to a live Wazuh, XDR, or SIEM service through the benefits page.
 
-The Wazuh alert feed and agent inventory are explicitly demo telemetry, not a live Wazuh connection. Configure trusted proxies before deployment so client IPs are only accepted from known proxies, and apply an appropriate retention period and privacy notice for stored IP addresses.
+The Wazuh alert feed and agent inventory are explicitly demo telemetry, not a live Wazuh connection. Configure trusted proxy IPs/CIDRs as a comma-separated `TRUSTED_PROXIES` value before deployment (leave it blank when requests connect directly) so forwarded client IPs are only accepted from known proxies. Apply an appropriate retention period and privacy notice for stored IP addresses.
 
 ### Admin audit log
 

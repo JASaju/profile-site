@@ -19,12 +19,20 @@ Route::get('/robots.txt', function () {
     return response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /login\n\nSitemap: " . url('/sitemap.xml') . "\n", 200, ['Content-Type' => 'text/plain']);
 });
 Route::get('/sitemap.xml', function () {
-    $last = optional(\App\Models\Profile::first())->updated_at ?? now();
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-         . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-         . '<url><loc>' . e(url('/')) . '</loc><lastmod>' . $last->toAtomString() . '</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>'
-         . '</urlset>';
-    return response($xml, 200, ['Content-Type' => 'application/xml']);
+    $lastModified = collect([
+        \App\Models\Profile::query()->max('updated_at'),
+        \App\Models\Slide::query()->max('updated_at'),
+        \App\Models\SocialLink::query()->max('updated_at'),
+        \App\Models\Education::query()->max('updated_at'),
+        \App\Models\Documentary::query()->max('updated_at'),
+        \App\Models\GalleryItem::query()->max('updated_at'),
+    ])->filter()->max();
+
+    return response()->view('sitemap', [
+        'lastModified' => $lastModified
+            ? \Illuminate\Support\Carbon::parse($lastModified)->toAtomString()
+            : null,
+    ])->header('Content-Type', 'application/xml; charset=UTF-8');
 });
 
 // Google Search Console ownership verification (HTML file method)
