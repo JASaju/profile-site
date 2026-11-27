@@ -11,7 +11,10 @@ use App\Models\Slide;
 use App\Models\SocialLink;
 use App\Services\AuditLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 
 class AdminController extends Controller
 {
@@ -99,6 +102,37 @@ class AdminController extends Controller
         );
 
         return back()->with('status', 'Profile saved.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $data = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                'different:current_password',
+                PasswordRule::min(12)->mixedCase()->numbers()->symbols(),
+            ],
+        ]);
+
+        $user = $request->user();
+        $user->forceFill([
+            'password' => Hash::make($data['password']),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        $request->session()->regenerate();
+
+        $this->auditLogger->record(
+            $request,
+            'admin.password.updated',
+            'Administrator password updated.',
+            'info'
+        );
+
+        return back()->with('status', 'Password updated successfully.');
     }
 
     public function store(Request $request, string $type)

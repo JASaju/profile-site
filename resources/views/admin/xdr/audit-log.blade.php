@@ -16,12 +16,12 @@
     <aside class="border-b border-slate-800 bg-slate-950 p-4 lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-b-0 lg:border-r">
         <a href="{{ route('admin.xdr') }}" class="flex items-center gap-3 px-2 py-2">
             <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 ring-1 ring-cyan-400/20">◈</span>
-            <span><span class="block text-sm font-semibold tracking-wide">SENTINEL XDR</span><span class="text-xs text-slate-500">Wazuh security console</span></span>
+            <span><span class="block text-sm font-semibold tracking-wide"></span><span class="text-xs text-slate-500">security console</span></span>
         </a>
         <nav class="mt-7 flex gap-2 lg:mt-10 lg:flex-col">
             <a href="{{ route('admin.xdr') }}" class="{{ $nav }} text-slate-400 hover:bg-slate-900 hover:text-white">◈ &nbsp; Overview</a>
             <a href="{{ route('admin.xdr.requests') }}" class="{{ $nav }} text-slate-400 hover:bg-slate-900 hover:text-white">⌁ &nbsp; Request activity</a>
-            <a href="{{ route('admin.xdr.benefits') }}" class="{{ $nav }} text-slate-400 hover:bg-slate-900 hover:text-white">✦ &nbsp; XDR &amp; SIEM benefits</a>
+           
             <a href="{{ route('admin.xdr.audit-log') }}" class="{{ $nav }} bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/20">▤ &nbsp; Audit log</a>
         </nav>
         <div class="mt-4 border-t border-slate-800 pt-4 text-sm lg:mt-auto">
@@ -75,7 +75,7 @@
                         <tbody class="divide-y divide-slate-800/80">
                         @forelse($auditLogs as $entry)
                             <tr class="align-top hover:bg-white/[0.02]">
-                                <td class="whitespace-nowrap px-5 py-4 text-xs text-slate-400">{{ $entry->created_at->format('Y-m-d H:i:s') }}</td>
+                                <td class="whitespace-nowrap px-5 py-4 text-xs text-slate-400">{{ $entry->created_at->timezone('Asia/Dhaka')->format('Y-m-d H:i:s') }}</td>
                                 <td class="px-4 py-4"><span class="rounded-md px-2 py-1 text-[10px] font-semibold uppercase {{ $entry->severity === 'critical' ? 'bg-rose-400/10 text-rose-300' : ($entry->severity === 'warning' ? 'bg-amber-400/10 text-amber-300' : 'bg-emerald-400/10 text-emerald-300') }}">{{ $entry->severity }}</span></td>
                                 <td class="px-4 py-4 text-xs text-slate-300">{{ $entry->user?->name ?? 'Unauthenticated' }}</td>
                                 <td class="max-w-64 px-4 py-4"><div class="font-mono text-xs text-cyan-200">{{ $entry->action }}</div><p class="mt-1 text-xs leading-5 text-slate-500">{{ $entry->description }}</p></td>

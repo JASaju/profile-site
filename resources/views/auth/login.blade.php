@@ -11,6 +11,9 @@
     <form method="POST" action="{{ url('/login') }}" class="bg-white w-full max-w-sm rounded-2xl shadow p-6 space-y-4">
         @csrf
         <h1 class="text-xl font-bold">Admin Login</h1>
+        @if (session('status'))
+            <p role="status" class="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">{{ session('status') }}</p>
+        @endif
 
         <div>
             <label class="block text-sm mb-1">Email</label>
@@ -23,6 +26,7 @@
             <label class="block text-sm mb-1">Password</label>
             <input type="password" name="password" required
                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-slate-400">
+            @error('password')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
         </div>
 
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember"> Remember me</label>

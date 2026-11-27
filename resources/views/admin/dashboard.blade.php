@@ -19,7 +19,7 @@
     <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <span class="font-semibold">Admin Dashboard</span>
         <div class="flex items-center gap-4 text-sm">
-            <a href="{{ route('admin.xdr') }}" class="text-slate-700 hover:text-slate-950">XDR / Wazuh</a>
+            <a href="{{ route('admin.xdr') }}" class="text-slate-700 hover:text-slate-950">Request activity</a>
             <a href="{{ route('admin.xdr.audit-log') }}" class="text-slate-700 hover:text-slate-950">Audit log</a>
             <a href="{{ route('home') }}" target="_blank" class="text-blue-600 hover:underline">View site</a>
             <form method="POST" action="{{ route('logout') }}">@csrf
@@ -39,6 +39,36 @@
             <ul class="list-disc ml-5">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
         </div>
     @endif
+
+    {{-- PASSWORD --}}
+    <section class="{{ $card }}">
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <div>
+                <h2 class="font-semibold">Update Password</h2>
+                <p class="mt-1 text-sm text-slate-500">Choose a strong password to protect your admin account.</p>
+            </div>
+        </div>
+        <form id="admin-password-form" method="POST" action="{{ route('admin.password') }}" class="grid gap-3 sm:grid-cols-3">
+            @csrf @method('PUT')
+            <div>
+                <label for="current_password" class="text-sm">Current Password</label>
+                <input id="current_password" class="{{ $input }}" type="password" name="current_password" autocomplete="current-password" required>
+                @error('current_password')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="password" class="text-sm">New Password</label>
+                <input id="password" class="{{ $input }}" type="password" name="password" autocomplete="new-password" required>
+                @error('password')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="password_confirmation" class="text-sm">Confirm Password</label>
+                <input id="password_confirmation" class="{{ $input }}" type="password" name="password_confirmation" autocomplete="new-password" required>
+            </div>
+            <div class="sm:col-span-3 flex justify-end">
+                <button class="{{ $btn }}">SAVE</button>
+            </div>
+        </form>
+    </section>
 
     {{-- PROFILE --}}
     <section class="{{ $card }}">

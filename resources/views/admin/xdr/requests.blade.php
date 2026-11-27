@@ -16,12 +16,12 @@
     <aside class="border-b border-slate-800 bg-slate-950 p-4 lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:border-b-0 lg:border-r">
         <a href="{{ route('admin.xdr') }}" class="flex items-center gap-3 px-2 py-2">
             <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 ring-1 ring-cyan-400/20">◈</span>
-            <span><span class="block text-sm font-semibold tracking-wide">SENTINEL XDR</span><span class="text-xs text-slate-500">Wazuh security console</span></span>
+            <span><span class="block text-sm font-semibold tracking-wide"></span><span class="text-xs text-slate-500">security console</span></span>
         </a>
         <nav class="mt-7 flex gap-2 lg:mt-10 lg:flex-col">
             <a href="{{ route('admin.xdr') }}" class="{{ $nav }} text-slate-400 hover:bg-slate-900 hover:text-white">◈ &nbsp; Overview</a>
             <a href="{{ route('admin.xdr.requests') }}" class="{{ $nav }} bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/20">⌁ &nbsp; Request activity</a>
-            <a href="{{ route('admin.xdr.benefits') }}" class="{{ $nav }} text-slate-400 hover:bg-slate-900 hover:text-white">✦ &nbsp; XDR &amp; SIEM benefits</a>
+          
             <a href="{{ route('admin.xdr.audit-log') }}" class="{{ $nav }} text-slate-400 hover:bg-slate-900 hover:text-white">▤ &nbsp; Audit log</a>
         </nav>
         <a href="{{ route('admin.dashboard') }}" class="mt-4 border-t border-slate-800 pt-4 text-sm text-slate-400 hover:text-white lg:mt-auto">← Back to admin</a>
@@ -57,7 +57,7 @@
                         <tbody class="divide-y divide-slate-800/80">
                         @forelse($requests as $activity)
                             <tr class="hover:bg-white/[0.02]">
-                                <td class="whitespace-nowrap px-5 py-3 text-xs text-slate-400">{{ $activity->created_at->format('Y-m-d H:i:s') }}</td>
+                                <td class="whitespace-nowrap px-5 py-3 text-xs text-slate-400">{{ $activity->created_at->timezone('Asia/Dhaka')->format('Y-m-d H:i:s') }}</td>
                                 <td class="whitespace-nowrap px-5 py-3 font-mono text-xs text-cyan-200">{{ $activity->ip_address ?: 'unknown' }}</td>
                                 <td class="px-5 py-3 text-xs">
                                     @php($geoService = app(\App\Services\IpGeolocationService::class))

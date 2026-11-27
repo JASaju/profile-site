@@ -27,6 +27,10 @@ The authenticated audit log is available at `/admin/xdr/audit-log`. Run `php art
 
 Audit records contain administrator IDs, source IP addresses, request paths, and selected before/after values. Credentials, tokens, and uploaded image contents/references are excluded from value snapshots. Restrict access to the database and audit page, inform users as required by your privacy policy, and set a retention/deletion schedule appropriate to your legal and operational requirements.
 
+### Admin password update
+
+Authenticated administrators can change their password from the **Update Password** card on `/admin`. The form requires the current password and a matching new password of at least 12 characters with uppercase, lowercase, numeric, and symbol characters. On success, the new password is hashed, the remember token is rotated, and the active session ID is regenerated. No email reset flow or extra database migration is used.
+
 ### Approximate IP geolocation
 
 Request activity and audit records can include an approximate country, region/city, and coordinates. Geolocation is opt-in: set `IP_GEOLOCATION_ENABLED=true` in `.env` and run `php artisan config:cache` if configuration is cached. The default provider is IPwho.is at `https://ipwho.is/{ip}` and requires no API key; set `IP_GEOLOCATION_URL` to a compatible provider endpoint if needed. Adjust `IP_GEOLOCATION_TIMEOUT`, `IP_GEOLOCATION_CACHE_DAYS`, and `IP_GEOLOCATION_REQUESTS_PER_MINUTE` to fit the environment. Apply `php artisan migrate` to add nullable location fields to existing activity and audit tables; the migration preserves existing records.
