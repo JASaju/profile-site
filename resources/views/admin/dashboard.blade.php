@@ -116,7 +116,7 @@
 
     {{-- SOCIAL --}}
     <section class="{{ $card }}">
-        <h2 class="font-semibold mb-3">Social links and Documents Link of Drive Share Link</h2>
+        <h2 class="font-semibold mb-3">Social and Drive Share Links</h2>
         <form method="POST" action="{{ route('admin.store', 'social') }}" class="grid sm:grid-cols-3 gap-2 mb-4">
             @csrf
             <input class="{{ $input }}" name="platform" placeholder="Facebook, Instagram, LinkedIn..." required>
